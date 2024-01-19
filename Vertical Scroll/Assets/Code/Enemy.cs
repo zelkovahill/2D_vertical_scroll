@@ -5,19 +5,73 @@ using UnityEngine;
 
 public class Enemy : MonoBehaviour
 {
+   public string Enemyname;
    public float speed;
    public float health; 
    public Sprite[] sprites;
+
+   public float maxShotDelay;
+   public float curShotDelay;
+   
+   public GameObject bulletObjA;
+   public GameObject bulletObjB;
+   public GameObject player;
    
    private SpriteRenderer _spriteRenderer;
-   private Rigidbody2D _rb;
+   
 
    void Awake()
    {
       _spriteRenderer = GetComponent<SpriteRenderer>();
-      _rb = GetComponent<Rigidbody2D>();
-      _rb.velocity = Vector2.down * speed;
+     
    }
+
+   void Update()
+   {
+      Fire();
+      Reload();
+   }
+
+   void Fire()
+   {
+      if(curShotDelay<maxShotDelay)
+         return;
+
+      if (Enemyname == "S")
+      {
+         GameObject bullet = Instantiate(bulletObjA, transform.position, transform.rotation);
+         Rigidbody2D rb = bullet.GetComponent<Rigidbody2D>();
+
+
+         Vector3 dirVec = player.transform.position - transform.position;
+         rb.AddForce(dirVec.normalized * 3, ForceMode2D.Impulse);
+
+      }
+      
+      else if (Enemyname == "L")
+      {
+         GameObject bulletL = Instantiate(bulletObjA, transform.position+Vector3.left*0.3f, transform.rotation);
+         GameObject bulletR = Instantiate(bulletObjA, transform.position+Vector3.right*0.3f, transform.rotation);
+         
+         Rigidbody2D rbL = bulletL.GetComponent<Rigidbody2D>();
+         Rigidbody2D rbR = bulletR.GetComponent<Rigidbody2D>();
+         
+         Vector3 dirVecL = player.transform.position - (transform.position+Vector3.left*0.3f);
+         Vector3 dirVecR = player.transform.position - (transform.position+Vector3.right*0.3f);
+         
+         rbL.AddForce(dirVecL.normalized * 4, ForceMode2D.Impulse);
+         rbR.AddForce(dirVecR.normalized * 4, ForceMode2D.Impulse);
+         
+      }
+      
+      curShotDelay = 0;
+   }
+
+   void Reload()
+   {
+      curShotDelay+=Time.deltaTime;
+   }
+   
 
    void OnHit(int dmg)
    {

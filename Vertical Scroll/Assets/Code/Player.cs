@@ -18,6 +18,8 @@ public class Player : MonoBehaviour
     public GameObject bulletObjA;
     public GameObject bulletObjB;
 
+    public GameManager manager;
+
     private Animator anim;
 
     void Awake()
@@ -118,6 +120,13 @@ public class Player : MonoBehaviour
                     break;
             }
         }
+        else if(other.gameObject.CompareTag("Enemy")||other.gameObject.CompareTag("EnemyBullet"))
+        {
+            manager.RespawnPlayer();
+            gameObject.SetActive(false);
+            
+        }
+        
     }
 
     private void OnTriggerExit2D(Collider2D other)
