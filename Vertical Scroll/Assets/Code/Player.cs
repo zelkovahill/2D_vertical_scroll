@@ -2,9 +2,12 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Experimental.GlobalIllumination;
 
 public class Player : MonoBehaviour
 {
+    public int life;
+    public int score;
     public float speed;
     public float power;
     public float maxShotDelay;
@@ -14,6 +17,7 @@ public class Player : MonoBehaviour
     public bool isTouchBottom;
     public bool isTouchRight;
     public bool isTouchLeft;
+    public bool isHit;
     
     public GameObject bulletObjA;
     public GameObject bulletObjB;
@@ -122,9 +126,27 @@ public class Player : MonoBehaviour
         }
         else if(other.gameObject.CompareTag("Enemy")||other.gameObject.CompareTag("EnemyBullet"))
         {
+            if (isHit)
+            {
+                return;
+            }
+
+            isHit = true;
+            life--;
+            manager.UpdateLifeIcon(life);
+
+            if (life == 0)
+            {
+                manager.GameOver();
+            }
+            else
+            {
+                manager.RespawnPlayer();
+            }
             manager.RespawnPlayer();
             gameObject.SetActive(false);
-            
+            Destroy(other.gameObject);
+
         }
         
     }
