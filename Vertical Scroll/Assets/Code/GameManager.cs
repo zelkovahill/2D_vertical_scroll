@@ -10,6 +10,7 @@ public class GameManager : MonoBehaviour
     public GameObject player;
     public Text scoreText;
     public Image[] lifeImage;
+    public Image[] boomImage;
     public GameObject gameOverSet;
     
     public float maxSpawnDelay;
@@ -70,6 +71,21 @@ public class GameManager : MonoBehaviour
         for (int i = 0; i < life; i++)
         {
             lifeImage[i].color = new Color(1, 1, 1, 1);
+        }
+    }
+    
+    public void UpdateBoomIcon(int boom)
+    {
+        for (int i = 0; i < 3; i++)
+        {
+            // #. UI Life Disable
+            boomImage[i].color = new Color(1, 1, 1, 0);
+        }
+        
+        // #. UI Life Active
+        for (int i = 0; i < boom; i++)
+        {
+            boomImage[i].color = new Color(1, 1, 1, 1);
         }
     }
 

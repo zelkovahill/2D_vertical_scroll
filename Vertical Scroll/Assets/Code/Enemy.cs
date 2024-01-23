@@ -1,7 +1,6 @@
-using System;
-using System.Collections;
-using System.Collections.Generic;
+
 using UnityEngine;
+
 
 public class Enemy : MonoBehaviour
 {
@@ -16,6 +15,9 @@ public class Enemy : MonoBehaviour
    
    public GameObject bulletObjA;
    public GameObject bulletObjB;
+   public GameObject itemCoin;
+   public GameObject itemPower;
+   public GameObject itemBoom;
    public GameObject player;
    
    private SpriteRenderer _spriteRenderer;
@@ -74,8 +76,11 @@ public class Enemy : MonoBehaviour
    }
    
 
-   void OnHit(int dmg)
+   public void OnHit(int dmg)
    {
+      if(health<=0)
+         return;
+         
       health -= dmg;
       _spriteRenderer.sprite = sprites[1];
       Invoke(nameof(ReturnSprite), 0.1f);
@@ -84,6 +89,31 @@ public class Enemy : MonoBehaviour
       {
          Player playerLogic = player.GetComponent<Player>();
          playerLogic.score += enemyScore;
+         
+         // # Random Ratio Item Drop
+         int ran = Random.Range(0, 10);
+         if (ran < 3) // Not Item 30%
+         {
+            
+         }
+         else if (ran < 6) // Coin 30%
+         {
+            Instantiate(itemCoin, transform.position, itemCoin.transform.rotation);
+            
+         }
+         
+         else if (ran < 8) // Power 20%
+         {
+            Instantiate(itemPower, transform.position, itemPower.transform.rotation);
+         }
+         
+         else if (ran < 10) // Boom 20%
+         {
+            Instantiate(itemBoom, transform.position, itemBoom.transform.rotation);
+         }
+       
+         
+         
          Destroy(gameObject);
       }
    }

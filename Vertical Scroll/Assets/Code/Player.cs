@@ -9,7 +9,10 @@ public class Player : MonoBehaviour
     public int life;
     public int score;
     public float speed;
-    public float power;
+    public int power;
+    public int maxPower;
+    public int boom;
+    public int maxBoom;
     public float maxShotDelay;
     public float curShotDelay;
     
@@ -18,9 +21,11 @@ public class Player : MonoBehaviour
     public bool isTouchRight;
     public bool isTouchLeft;
     public bool isHit;
+    public bool isBoomTime;
     
     public GameObject bulletObjA;
     public GameObject bulletObjB;
+    public GameObject BoomEffect;
 
     public GameManager manager;
 
@@ -34,6 +39,7 @@ public class Player : MonoBehaviour
     {
         Move();
         Fire();
+        Boom();
         Reload();
 
     }
@@ -104,6 +110,44 @@ public class Player : MonoBehaviour
         curShotDelay+= Time.deltaTime;
     }
 
+    void Boom()
+    {
+        if(!Input.GetButton("Fire2"))
+            return;
+
+        if (isBoomTime)
+            return;
+        
+        if(boom==0)
+            return;
+
+        boom--;
+        isBoomTime = true;
+        manager.UpdateBoomIcon(boom);
+        
+        
+            // # 1 . Effect visible
+            BoomEffect.SetActive(true);
+            Invoke(nameof(OffBoomEffect), 4f);
+                    
+            // # 2 . Remove Enemy
+            GameObject[] enemies = GameObject.FindGameObjectsWithTag("Enemy");
+            for (int i = 0; i < enemies.Length; i++)
+            {
+                Enemy enemyLogic = enemies[i].GetComponent<Enemy>();
+                enemyLogic.OnHit(1000);
+            }
+                    
+            // # 3 . Remove Enemy Bullet
+            GameObject[] bullets = GameObject.FindGameObjectsWithTag("EnemyBullet");
+            for (int i = 0; i < bullets.Length; i++)
+            {
+                Destroy(bullets[i]);
+            }
+        
+            
+    }
+
     private void OnTriggerEnter2D(Collider2D other)
     {
         if (other.gameObject.CompareTag("Border"))
@@ -148,7 +192,47 @@ public class Player : MonoBehaviour
             Destroy(other.gameObject);
 
         }
-        
+        else if (other.gameObject.CompareTag("Item"))
+        {
+            Item item = other.gameObject.GetComponent<Item>();
+            switch (item.type)
+            {
+                case "Coin":
+                    score += 1000;
+                    break;
+                
+                case "Power":
+                    if (maxPower == power)
+                    {
+                        score += 500;
+                    }
+                    else
+                    {
+                        power++;
+                    }
+                    
+                    break;
+                
+                case "Boom":
+                    if (boom == maxBoom)
+                        score += 500;
+                    else
+                    {
+                        boom++;
+                        manager.UpdateBoomIcon(boom);
+                    }
+                   
+                    break;
+            }
+
+            Destroy(other.gameObject);
+        }
+    }
+    
+    void OffBoomEffect()
+    {
+        BoomEffect.SetActive(false);
+        isBoomTime = false;
     }
 
     private void OnTriggerExit2D(Collider2D other)
